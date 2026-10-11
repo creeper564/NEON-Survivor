@@ -12,6 +12,10 @@ Affronte des vagues de monstres, ramasse l'XP, monte de niveau, choisis tes amé
 2. Garde l'arborescence intacte.
 3. Double-clique sur `index.html`.
 
+OU
+
+1. lancer la version web
+
 C'est tout. Aucune dépendance, aucun CDN.
 
 ---
