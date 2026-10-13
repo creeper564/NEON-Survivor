@@ -9,7 +9,7 @@ const GAME_CONFIG = {
   // Adresse de ton projet Supabase, sans slash final.
   // Exemple : 'https://abcdefghijklmnop.supabase.co'
   // Laisse vide ('') pour désactiver le classement (le jeu reste jouable hors ligne).
-  supabaseUrl: 'https://umfiabwxslwzendhudty.supabase.co/rest/v1/',
+  supabaseUrl: 'https://umfiabwxslwzendhudty.supabase.co',
 
   // Clé PUBLIQUE de ton projet (« Publishable key », commence par sb_publishable_...,
   // ou l'ancienne clé « anon »). Elle peut être publiée sans risque : ne mets JAMAIS la clé « secret »
