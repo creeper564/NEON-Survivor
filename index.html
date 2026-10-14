@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#05060a">
+<title>NEON SURVIVORS</title>
+<link rel="stylesheet" href="css/style.css?v=20261013a">
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div id="hudLeft">
+    <div id="topInfo">
+      <div class="chip">Niveau <span id="hudLevel">1</span></div>
+      <div class="chip">Vague <span id="hudWave">1</span></div>
+      <div class="chip">⏱ <span id="hudTime">00:00</span></div>
+      <div class="chip">💀 <span id="hudKills">0</span></div>
+      <div class="chip">🏆 <span id="hudScore">0</span></div>
+      <div class="chip hidden" id="invincibleTag">🛡 INVINCIBLE</div>
+    </div>
+    <div class="hp-bar-wrap"><div class="hp-bar-fill" id="hpFill" style="width:100%"></div><div class="bar-label" id="hpLabel">100/100</div></div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div><div class="bar-label" id="xpLabel">0/10</div></div>
+  </div>
+</div>
+<div id="abilitiesPanel"></div>
+<div id="bossBarWrap">
+  <div class="bb-name" id="bossName">BOSS</div>
+  <div id="bossBarFillWrap"><div id="bossBarFill"></div></div>
+</div>
+<button id="pauseBtn" class="hidden">⏸ Pause</button>
+<button id="muteBtn" class="hidden">🔊</button>
+<button id="fsBtn" class="hidden">⛶</button>
+<button id="devBtn" class="hidden">🛠</button>
+
+<div id="devHud" class="hidden">
+  DEV MODE<br>
+  FPS: <span id="devFps">60</span><br>
+  Enemies: <span id="devEnemies">0</span><br>
+  Projectiles: <span id="devProjectiles">0</span><br>
+  Particles: <span id="devParticles">0</span><br>
+  XP Orbs: <span id="devOrbs">0</span><br>
+  Pos: <span id="devPosX">0</span>, <span id="devPosY">0</span>
+</div>
+<div id="devCheatIndicator" class="hidden"></div>
+
+<!-- MAIN MENU -->
+<div id="mainMenu" class="screen">
+  <div class="title">NEON SURVIVORS</div>
+  <div class="subtitle">SURVIVEZ • ÉVOLUEZ • DOMINEZ</div>
+  <div class="menu-stats">
+    <div class="menu-stat"><div class="val" id="menuBestScore">0</div><div class="lab">MEILLEUR SCORE</div></div>
+    <div class="menu-stat"><div class="val" id="menuBestTime">00:00</div><div class="lab">MEILLEUR TEMPS</div></div>
+    <div class="menu-stat"><div class="val" id="menuCredits">0</div><div class="lab">CRÉDITS</div></div>
+    <div class="menu-stat"><div class="val" id="menuPermLevel">1</div><div class="lab">RANG</div></div>
+  </div>
+  <button class="btn" id="btnPlay">▶ JOUER</button>
+  <button class="btn" id="btnShop">🛒 BOUTIQUE</button>
+  <button class="btn" id="btnLeaderboard">🌍 CLASSEMENT MONDIAL</button>
+  <button class="btn" id="btnStats">📊 STATISTIQUES</button>
+  <button class="btn" id="btnOptions">⚙ OPTIONS</button>
+  <div class="rotate-hint">📱 Pour jouer confortablement, tourne ton téléphone en mode paysage.</div>
+  <div class="touch-help">Mobile : joystick gauche = se déplacer · joystick droit = viser et tirer · sans doigt à droite, le tir vise l'ennemi le plus proche.</div>
+</div>
+
+<!-- WORLD SELECT -->
+<div id="worldMenu" class="screen hidden">
+  <div class="panel">
+    <h2>CHOISIR UNE ARÈNE</h2>
+    <div class="worldSelect" id="worldSelectGrid"></div>
+    <button class="btn" id="btnStartRun">COMMENCER</button>
+    <button class="btn small" id="btnBackFromWorld">Retour</button>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div id="shopMenu" class="screen hidden">
+  <div class="panel">
+    <h2>🛒 BOUTIQUE - AMÉLIORATIONS PERMANENTES</h2>
+    <div style="text-align:center;margin-bottom:16px;font-size:14px;color:#ffb800;">Crédits : <span id="shopCredits">0</span></div>
+    <div class="acc-tabs">
+      <button type="button" id="tabShopUpgrades" class="active">Améliorations</button>
+      <button type="button" id="tabShopSkins">Skins</button>
+    </div>
+    <div class="shop-grid" id="shopGrid"></div>
+    <div class="shop-grid hidden" id="skinGrid"></div>
+    <button class="btn small" id="btnBackFromShop">Retour</button>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboardMenu" class="screen hidden">
+  <div class="panel">
+    <h2>🌍 CLASSEMENT MONDIAL</h2>
+    <div class="lb-name-row">
+      <span id="lbAccountLabel" class="lb-account-label">Non connecté</span>
+      <button class="btn small" id="btnLbAccount" style="margin:0;">Se connecter</button>
+    </div>
+    <div id="lbStatus" class="lb-status"></div>
+    <div id="lbTable"></div>
+    <button class="btn small" id="btnRefreshLeaderboard">🔄 Actualiser</button>
+    <button type="button" class="link-btn" id="btnDiag">🔧 Un problème ? Tester la connexion</button>
+    <div id="diagResult" class="diag-result hidden"></div>
+    <button class="btn small" id="btnBackFromLeaderboard">Retour</button>
+  </div>
+</div>
+
+<!-- ACCOUNT -->
+<div id="accountMenu" class="screen hidden">
+  <div class="panel">
+    <h2>👤 MON COMPTE</h2>
+    <div id="accStatus" class="lb-status"></div>
+
+    <!-- Connecté -->
+    <div id="accLoggedIn" class="hidden">
+      <div class="acc-info">Pseudo : <b id="accUsername"></b></div>
+      <div class="acc-info">Email : <span id="accEmail"></span></div>
+      <button class="btn small" id="btnAccLogout">Se déconnecter</button>
+      <button class="btn small danger" id="btnAccDelete">Supprimer mon compte</button>
+    </div>
+
+    <!-- Compte sans pseudo -->
+    <form id="formUsername" class="acc-form hidden" autocomplete="off">
+      <p class="acc-help">Choisis ton pseudo public : 3 à 16 caractères (lettres sans accent, chiffres, _ ou -). Il ne pourra plus être modifié.</p>
+      <input id="usernameInput" maxlength="16" placeholder="Pseudo" autocomplete="off" spellcheck="false" autocapitalize="off">
+      <button class="btn small" type="submit">VALIDER LE PSEUDO</button>
+    </form>
+
+    <!-- Nouveau mot de passe (lien reçu par email) -->
+    <form id="formRecovery" class="acc-form hidden">
+      <p class="acc-help">Choisis ton nouveau mot de passe.</p>
+      <input id="recoveryPassword" type="password" minlength="8" placeholder="Nouveau mot de passe (8 caractères min.)" autocomplete="new-password">
+      <button class="btn small" type="submit">CHANGER LE MOT DE PASSE</button>
+    </form>
+
+    <!-- Non connecté -->
+    <div id="accLoggedOut">
+      <div class="acc-tabs">
+        <button type="button" id="tabLogin" class="active">Connexion</button>
+        <button type="button" id="tabSignup">Créer un compte</button>
+      </div>
+      <form id="formLogin" class="acc-form">
+        <input id="loginEmail" type="email" placeholder="Email" autocomplete="email">
+        <input id="loginPassword" type="password" placeholder="Mot de passe" autocomplete="current-password">
+        <button class="btn small" type="submit">SE CONNECTER</button>
+        <button type="button" class="link-btn" id="btnForgot">Mot de passe oublié ?</button>
+      </form>
+      <form id="formSignup" class="acc-form hidden">
+        <input id="signupUsername" maxlength="16" placeholder="Pseudo public (3 à 16 caractères)" autocomplete="username" spellcheck="false" autocapitalize="off">
+        <input id="signupEmail" type="email" placeholder="Email" autocomplete="email">
+        <input id="signupPassword" type="password" minlength="8" placeholder="Mot de passe (8 caractères min.)" autocomplete="new-password">
+        <p class="acc-help">Ton email sert uniquement à te connecter et à récupérer ton compte. Il n'est jamais affiché dans le classement.</p>
+        <button class="btn small" type="submit">CRÉER MON COMPTE</button>
+      </form>
+    </div>
+
+    <button class="btn small" id="btnBackFromAccount">Retour</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="statsMenu" class="screen hidden">
+  <div class="panel">
+    <h2>📊 STATISTIQUES</h2>
+    <div class="stats-grid" id="statsGrid"></div>
+    <button class="btn small" id="btnBackFromStats">Retour</button>
+  </div>
+</div>
+
+<!-- OPTIONS -->
+<div id="optionsMenu" class="screen hidden">
+  <div class="panel">
+    <h2>⚙ OPTIONS</h2>
+    <div class="stats-grid">
+      <div class="stat-line"><span>Son</span><span id="optSoundState">Activé</span></div>
+      <div class="stat-line"><span>Tir automatique</span><span id="optAutoFireState">Désactivé</span></div>
+    </div>
+    <button class="btn small" id="btnToggleSound">Basculer le son</button>
+    <button class="btn small" id="btnToggleAutoFire">Basculer tir auto</button>
+    <button class="btn small danger" id="btnResetData">Réinitialiser toutes les données</button>
+
+    <div class="dev-section">
+      <h2 style="font-size:16px;">MODE DÉVELOPPEUR</h2>
+      <div id="devStatusText" style="text-align:center;font-size:12px;color:#ffd54f;margin-bottom:8px;"></div>
+      <div class="dev-code-row">
+        <input type="password" id="devCodeInput" placeholder="Code développeur">
+        <button class="btn small" id="btnDevActivate" style="margin:0;width:auto;">ACTIVER</button>
+      </div>
+      <div id="devCodeMsg"></div>
+      <div style="text-align:center;">
+        <button class="btn small danger" id="btnDevDeactivate">Désactiver le mode dev</button>
+      </div>
+
+      <div id="devPanel" class="hidden">
+        <h2 style="font-size:14px;margin-top:16px;">CHEATS</h2>
+        <div id="devCheatList"></div>
+
+        <h2 style="font-size:14px;margin-top:12px;">VALEURS EN TEMPS RÉEL</h2>
+        <div id="devOverrideList"></div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+          <button class="btn small" id="btnDevApplyOverrides" style="margin:0;">APPLIQUER</button>
+          <button class="btn small" id="btnDevResetOverrides" style="margin:0;">RESET</button>
+        </div>
+
+        <h2 style="font-size:14px;margin-top:14px;">ACTIONS</h2>
+        <div class="dev-actions-grid">
+          <button id="btnDevLevel">+1 NIVEAU</button>
+          <button id="btnDevXP">+1000 XP</button>
+          <button id="btnDevCredits">+10 000 CRÉDITS</button>
+          <button id="btnDevFullHp">FULL PV</button>
+          <button id="btnDevSpawnBoss">SPAWN BOSS</button>
+          <button id="btnDevSpawnElite">SPAWN ÉLITE</button>
+          <button id="btnDevKillAll">KILL ALL</button>
+          <button id="btnDevKillBoss">KILL BOSS</button>
+          <button id="btnDevClearEnemies">CLEAR ENEMIES</button>
+          <button id="btnDevDebugCollisions">DEBUG COLLISIONS</button>
+        </div>
+        <div style="text-align:center;">
+          <button class="btn small danger" id="btnDevResetAllCheats">DÉSACTIVER TOUS LES CHEATS</button>
+        </div>
+        <p class="desktop-only" style="text-align:center;font-size:10px;color:#8a93b8;margin-top:10px;">
+          F2 Panneau · F3 Invincible · F4 +1 Niveau · F5 +1000 XP · F6 +10000 Crédits · F7 Kill All · F8 Spawn Boss · F9 Full PV
+        </p>
+      </div>
+    </div>
+
+    <button class="btn small" id="btnBackFromOptions">Retour</button>
+  </div>
+</div>
+
+<!-- DEV QUICK PANEL (F2) -->
+<div id="devPanelOverlay">
+  <div class="panel">
+    <h2>🛠 PANNEAU DÉVELOPPEUR RAPIDE</h2>
+    <p style="text-align:center;font-size:12px;color:#8a93b8;margin-bottom:10px;">Gérez le mode développeur complet dans Options → Mode Développeur.</p>
+    <div class="dev-actions-grid">
+      <button id="btnDevLevel2">+1 NIVEAU</button>
+      <button id="btnDevXP2">+1000 XP</button>
+      <button id="btnDevCredits2">+10 000 CRÉDITS</button>
+      <button id="btnDevFullHp2">FULL PV</button>
+      <button id="btnDevSpawnBoss2">SPAWN BOSS</button>
+      <button id="btnDevKillAll2">KILL ALL</button>
+    </div>
+    <button class="btn small" id="btnDevClosePanel">Fermer (F2)</button>
+  </div>
+</div>
+
+<!-- LEVEL UP -->
+<div id="levelupOverlay">
+  <h2>⬆ NIVEAU SUPÉRIEUR ⬆</h2>
+  <div id="upgradeChoices"></div>
+</div>
+
+<!-- PAUSE -->
+<div id="pauseOverlay">
+  <h2>⏸ PAUSE</h2>
+  <button class="btn" id="btnResume">REPRENDRE</button>
+  <button class="btn" id="btnRestartFromPause">RECOMMENCER</button>
+  <button class="btn" id="btnQuitToMenu">QUITTER VERS LE MENU</button>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameoverOverlay">
+  <h1>GAME OVER</h1>
+  <div class="go-stats">
+    <div class="go-stat"><div class="gv" id="goTime">00:00</div><div class="gl">TEMPS DE SURVIE</div></div>
+    <div class="go-stat"><div class="gv" id="goKills">0</div><div class="gl">MONSTRES TUÉS</div></div>
+    <div class="go-stat"><div class="gv" id="goLevel">1</div><div class="gl">NIVEAU ATTEINT</div></div>
+    <div class="go-stat"><div class="gv" id="goBoss">0</div><div class="gl">BOSS TUÉS</div></div>
+    <div class="go-stat"><div class="gv" id="goScore">0</div><div class="gl">SCORE</div></div>
+    <div class="go-stat"><div class="gv" id="goCredits">0</div><div class="gl">CRÉDITS GAGNÉS</div></div>
+  </div>
+  <div id="goLeaderboard" class="go-lb hidden">
+    <div id="goAccountLine" class="go-account-line"></div>
+    <button class="btn small hidden" id="btnSubmitScore">🏆 ENVOYER AU CLASSEMENT</button>
+    <button class="btn small hidden" id="btnGoLogin">👤 SE CONNECTER</button>
+    <div id="goLbStatus" class="lb-status"></div>
+  </div>
+  <button class="btn" id="btnReplay">🔄 REJOUER</button>
+  <button class="btn" id="btnGoMenu">🏠 MENU PRINCIPAL</button>
+</div>
+
+<div id="toast"></div>
+
+<!-- Scripts : ordre important (dépendances) -->
+<script src="js/diagnostic.js?v=20261013a"></script>
+<script src="js/config.js?v=20261013a"></script>
+<script src="js/dev.js?v=20261013a"></script>
+<script src="js/save.js?v=20261013a"></script>
+<script src="js/account.js?v=20261013a"></script>
+<script src="js/leaderboard.js?v=20261013a"></script>
+<script src="js/audio.js?v=20261013a"></script>
+<script src="js/particles.js?v=20261013a"></script>
+<script src="js/projectiles.js?v=20261013a"></script>
+<script src="js/xp.js?v=20261013a"></script>
+<script src="js/weapons.js?v=20261013a"></script>
+<script src="js/abilities.js?v=20261013a"></script>
+<script src="js/skins.js?v=20261013a"></script>
+<script src="js/player.js?v=20261013a"></script>
+<script src="js/enemies.js?v=20261013a"></script>
+<script src="js/boss.js?v=20261013a"></script>
+<script src="js/ui.js?v=20261013a"></script>
+<script src="js/game.js?v=20261013a"></script>
+<script src="js/main.js?v=20261013a"></script>
+</body>
+</html>
