@@ -100,6 +100,11 @@ class Player {
       if (a.active && Math.hypot(a.dx, a.dy) > 0.2) {
         aimAngle = Math.atan2(a.dy, a.dx);
         wantFire = true;
+      } else if (a.active) {
+        // Doigt posé à droite sans glisser = « clic maintenu » : tir forcé vers l'ennemi le plus proche
+        const target = this.findNearestEnemy(1200);
+        aimAngle = target ? Math.atan2(target.y - this.y, target.x - this.x) : this.facingAngle;
+        wantFire = true;
       } else {
         const target = this.findNearestEnemy(this.weapon.rangeVal);
         if (target) {
@@ -148,13 +153,13 @@ class Player {
       const dmg = this.weapon.damage * (isCrit ? this.weapon.critMult : 1);
       const vx = Math.cos(angle) * this.weapon.speed;
       const vy = Math.sin(angle) * this.weapon.speed;
-      const p = new Projectile(this.x, this.y, vx, vy, dmg, isCrit, this.weapon.pierce, '#00f2ff', 5, 'player');
+      const p = new Projectile(this.x, this.y, vx, vy, dmg, isCrit, this.weapon.pierce, skinBulletColor(), 5, 'player');
       p.maxRange = this.weapon.rangeVal;
       game.projectiles.push(p);
     }
     audioEngine.shoot();
     for (let i = 0; i < 3; i++) {
-      game.particleSystem.particles.push(new Particle(this.x, this.y, rand(-40, 40), rand(-40, 40), 0.2, '#00f2ff', 2));
+      game.particleSystem.particles.push(new Particle(this.x, this.y, rand(-40, 40), rand(-40, 40), 0.2, skinBulletColor(), 2));
     }
   }
 
@@ -171,24 +176,8 @@ class Player {
     ctx.ellipse(x, y + this.radius * 0.8, this.radius * 0.9, this.radius * 0.4, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.translate(x, y);
-    ctx.rotate(this.facingAngle);
-    ctx.shadowColor = this.hitFlash > 0 ? '#ff3355' : '#00f2ff';
-    ctx.shadowBlur = 16;
-    const grad = ctx.createLinearGradient(-this.radius, 0, this.radius, 0);
-    grad.addColorStop(0, this.hitFlash > 0 ? '#ff6666' : '#3fd4ff');
-    grad.addColorStop(1, this.hitFlash > 0 ? '#ff2233' : '#7c4dff');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.moveTo(this.radius + 6, 0);
-    ctx.lineTo(-this.radius * 0.7, this.radius * 0.8);
-    ctx.lineTo(-this.radius * 0.3, 0);
-    ctx.lineTo(-this.radius * 0.7, -this.radius * 0.8);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    // Vaisseau (apparence = skin équipé)
+    drawShip(ctx, x, y, this.radius, this.facingAngle, currentSkin(), { flash: this.hitFlash > 0, time: performance.now() });
     ctx.restore();
 
     // Barre de vie au-dessus du joueur

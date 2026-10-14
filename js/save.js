@@ -23,6 +23,7 @@ const SaveManager = {
         totalCreditsEarned: 0,
         totalDamageDealt: 0
       },
+      skins: { owned: ['neon'], selected: 'neon' },
       settings: { soundOn: true, musicVolume: 0.6, sfxVolume: 0.6, autoFire: false },
       savedAt: Date.now()
     };
@@ -47,6 +48,15 @@ const SaveManager = {
           const v = data.stats[k];
           if (typeof v === 'number' && isFinite(v)) d.stats[k] = Math.max(0, v);
         }
+      }
+      if (data.skins && typeof data.skins === 'object') {
+        const known = (typeof SKINS !== 'undefined') ? SKINS.map(s => s.id) : null;
+        if (Array.isArray(data.skins.owned)) {
+          for (const id of data.skins.owned) {
+            if (typeof id === 'string' && (!known || known.indexOf(id) !== -1) && d.skins.owned.indexOf(id) === -1) d.skins.owned.push(id);
+          }
+        }
+        if (typeof data.skins.selected === 'string' && d.skins.owned.indexOf(data.skins.selected) !== -1) d.skins.selected = data.skins.selected;
       }
       if (data.settings && typeof data.settings === 'object') {
         if (typeof data.settings.soundOn === 'boolean') d.settings.soundOn = data.settings.soundOn;
